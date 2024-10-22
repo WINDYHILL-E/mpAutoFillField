@@ -1,28 +1,73 @@
 package com.example.mp;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.example.mp.bean.Student;
 import com.example.mp.mapper.StudentMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.concurrent.locks.Lock;
+
+@Slf4j
 @SpringBootTest
 class MpAutoFillFieldApplicationTests {
-
-	Logger logger = LoggerFactory.getLogger(MpAutoFillFieldApplicationTests.class);
 
 	@Autowired
 	private StudentMapper studentMapper;
 
 	@Test
-	void contextLoads() {
-		Student student = new Student();
-		student.setName("yahahah");
+	synchronized void contextLoads() {
+
+		 {
+			try {
+				Student student = new Student();
+				student.setName("yahahah");
+
+				insert(student);
+
+				student = getById(student.getId());
+				log.info(student.toString());
+
+				this.wait(3000);
+
+				student.setUpdateTime(null);
+				delete(student);
+
+				student = getById(student.getId());
+				log.info(String.valueOf(student));
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+
+	}
+
+	void insert(Student student) {
 		studentMapper.insert(student);
-		Student selectById = studentMapper.selectById(student.getId());
-		logger.info(selectById.toString());
+	}
+
+	Student getById(Long id) {
+		return studentMapper.selectById(id);
+	}
+
+	void delete(Student student) {
+
+		studentMapper.deleteById(student);
+
+		// studentMapper.deleteByIdWithFill(student);
+
+		UpdateWrapper<Student> wrapper = new UpdateWrapper<>();
+		wrapper.eq("id", student.getId());
+		wrapper.set("deleted", 1);
+		// studentMapper.update(student, wrapper);
+	}
+
+	void delete(Long id) {
+		studentMapper.deleteById(id);
 	}
 
 }

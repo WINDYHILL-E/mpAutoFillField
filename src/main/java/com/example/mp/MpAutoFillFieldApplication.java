@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.example.mp.mapper")
+@MapperScan(basePackages = "com.example.mp.mapper")
 public class MpAutoFillFieldApplication {
 
 	public static void main(String[] args) {
