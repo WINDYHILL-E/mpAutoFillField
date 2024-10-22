@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Date;
+import java.util.Timer;
 import java.util.concurrent.locks.Lock;
 
 @Slf4j
@@ -19,26 +21,21 @@ class MpAutoFillFieldApplicationTests {
 
     @Test
     synchronized void contextLoads() {
-        try {
-            Student student = new Student();
-            student.setName("yahahah");
 
-            insert(student);
+        Student student = new Student();
+        student.setName("yahahah" + new Date().getTime());
 
-            student = getById(student.getId());
-            log.info(student.toString());
+        insert(student);
 
-            this.wait(3000);
+        student = getById(student.getId());
+        log.info(student.toString());
 
-            student.setUpdateTime(null);
-            delete(student);
+        student.setUpdateTime(null);
+        delete(student);
 
-            student = getById(student.getId());
-            log.info(String.valueOf(student));
+        student = getById(student.getId());
+        log.info(String.valueOf(student));
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     void insert(Student student) {
